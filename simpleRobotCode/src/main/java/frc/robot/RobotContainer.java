@@ -5,9 +5,20 @@
 package frc.robot;
 
 import frc.robot.Constants.OperatorConstants;
+import frc.robot.chassis.commands.auto.FieldTarget;
+import frc.robot.chassis.commands.auto.FieldTarget.ELEMENT_POSITION;
+import frc.robot.chassis.commands.auto.FieldTarget.FEEDER_SIDE;
+import frc.robot.chassis.commands.auto.FieldTarget.LEVEL;
+import frc.robot.chassis.commands.auto.FieldTarget.POSITION;
+import frc.robot.chassis.subsystems.Chassis;
 import frc.robot.commands.Autos;
 import frc.robot.commands.ExampleCommand;
+import frc.robot.leds.Robot1Strip;
+import frc.robot.leds.subsystems.LedManager;
+import frc.robot.robot1.arm.subsystems.Arm;
+import frc.robot.robot1.gripper.subsystems.Gripper;
 import frc.robot.subsystems.ExampleSubsystem;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
@@ -19,19 +30,28 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
  * subsystems, commands, and trigger mappings) should be declared here.
  */
 public class RobotContainer {
+  public static FEEDER_SIDE currentFeederSide;
+  public static Gripper gripper;
+  public static Arm arm;
+  public static Chassis chassis; 
+  public static LedManager ledManager;
+  public static boolean isRed;
+  public static Robot1Strip robot1Strip;
+    public static boolean isComp = DriverStation.isFMSAttached();
   // The robot's subsystems and commands are defined here...
   private final ExampleSubsystem m_exampleSubsystem = new ExampleSubsystem();
-
+  public static FieldTarget scoringTarget = new FieldTarget(POSITION.A, ELEMENT_POSITION.CORAL_LEFT, LEVEL.L3);
   // Replace with CommandPS4Controller or CommandJoystick if needed
-  private final CommandXboxController m_driverController =
-      new CommandXboxController(OperatorConstants.kDriverControllerPort);
-
+ 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
     // Configure the trigger bindings
     configureBindings();
   }
 
+  public static boolean isRed() {
+    return isRed;
+  }
   /**
    * Use this method to define your trigger->command mappings. Triggers can be created via the
    * {@link Trigger#Trigger(java.util.function.BooleanSupplier)} constructor with an arbitrary
@@ -48,7 +68,10 @@ public class RobotContainer {
 
     // Schedule `exampleMethodCommand` when the Xbox controller's B button is pressed,
     // cancelling on release.
-    m_driverController.b().whileTrue(m_exampleSubsystem.exampleMethodCommand());
+
+  }
+  public static boolean isComp() {
+    return isComp;
   }
 
   /**
