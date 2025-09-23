@@ -73,6 +73,7 @@ public class Arm extends SubsystemBase {
   private boolean hasArmAngleReachedTarget;
   private double lastArmAngleTarget;
 
+
   /**
    * creates a new Arm, should only be one
    * <br>

@@ -5,6 +5,7 @@
 package frc.robot;
 
 import frc.robot.Constants.OperatorConstants;
+import frc.robot.NewArm.commands.MoveArm;
 import frc.robot.chassis.commands.Drive;
 import frc.robot.chassis.commands.auto.FieldTarget;
 import frc.robot.chassis.commands.auto.FieldTarget.ELEMENT_POSITION;
@@ -16,20 +17,23 @@ import frc.robot.commands.Autos;
 import frc.robot.commands.ExampleCommand;
 import frc.robot.leds.Robot1Strip;
 import frc.robot.leds.subsystems.LedManager;
-import frc.robot.robot1.arm.subsystems.Arm;
+import frc.robot.robot1.arm.commands.ArmDrive;
+import frc.robot.NewArm.NewArm;
 import frc.robot.robot1.gripper.subsystems.Gripper;
 import frc.robot.subsystems.ExampleSubsystem;
 import frc.robot.utils.CommandController;
 import frc.robot.utils.CommandController.ControllerType;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
-import edu.wpi.first.wpilibj2.command.button.Trigger;
+import frc.robot.robot1.arm.subsystems.*;;
 
 
 public class RobotContainer {
   public static FEEDER_SIDE currentFeederSide;
   public static Gripper gripper;
+  public static NewArm newArm;
   public static Arm arm;
   public static Chassis chassis; 
   public static LedManager ledManager;
@@ -38,6 +42,7 @@ public class RobotContainer {
   public static boolean isComp = DriverStation.isFMSAttached();
   public static CommandController driverController;
   public static CommandController operatorController;
+  public static CommandXboxController controller;
 
   private final ExampleSubsystem m_exampleSubsystem = new ExampleSubsystem();
   public static FieldTarget scoringTarget = new FieldTarget(POSITION.A, ELEMENT_POSITION.CORAL_LEFT, LEVEL.L3);
@@ -47,6 +52,8 @@ public class RobotContainer {
   public RobotContainer() {
     driverController = new CommandController(OperatorConstants.DRIVER_CONTROLLER_PORT, ControllerType.kXbox);
     operatorController = new CommandController(OperatorConstants.OPERATOR_CONTROLLER_PORT, ControllerType.kXbox);
+    controller = new CommandXboxController(0);
+    //controller.a().onTrue(new MoveArm(null));
 
     configureBindings();
   }
@@ -56,7 +63,7 @@ public class RobotContainer {
   }
 
   private void configureBindings() {
-
+    operatorController.rightButton().onTrue(new InstantCommand(() -> new MoveArm(newArm)));
 
   }
   public static boolean isComp() {
