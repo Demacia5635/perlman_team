@@ -35,17 +35,14 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.RobotContainer;
-import frc.robot.chassis.commands.auto.FieldTarget;
 import static frc.robot.chassis.utils.ChassisConstants.*;
 
-import frc.robot.chassis.utils.ChassisConstants.AccelConstants;
 import frc.robot.chassis.utils.SwerveKinematics;
 import frc.robot.utils.LogManager;
 import frc.robot.utils.Utils;
 import frc.robot.vision.Camera;
 import frc.robot.vision.Camera.CameraType;
 import frc.robot.vision.subsystem.Tag;
-import frc.robot.vision.utils.VisionConstants;
 import frc.robot.vision.utils.VisionFuse;
 
 public class Chassis extends SubsystemBase {
@@ -171,46 +168,6 @@ public class Chassis extends SubsystemBase {
     }
 
 
-    public void setRobotRelSpeedsWithAccel(ChassisSpeeds speeds){
-        ChassisSpeeds currentSpeeds = getChassisSpeedsRobotRel();
-
-        Translation2d limitedVelocitiesVector = calculateVelocity(speeds.vxMetersPerSecond, speeds.vyMetersPerSecond, currentSpeeds.vxMetersPerSecond, currentSpeeds.vyMetersPerSecond);//lastWantedSpeeds);
-        ChassisSpeeds limitedVelocities = new ChassisSpeeds(limitedVelocitiesVector.getX(), limitedVelocitiesVector.getY(), speeds.omegaRadiansPerSecond);
-        
-        setRobotRelVelocities(limitedVelocities);
-    }
-
-    double lastAngle = 0;
-    private Translation2d calculateVelocity(double wantedSpeedsX, double wantedSpeedsY, double currentSpeedsX, double currentSpeedsY) {
-        double wantedSpeedsNorm = Utils.hypot(wantedSpeedsX, wantedSpeedsY);
-        double currentSpeedsNorm = Utils.hypot(currentSpeedsX, currentSpeedsY);
-        double wantedSpeedsAngle = Utils.angleFromTranslation2d(wantedSpeedsX, wantedSpeedsY);
-        double currentSpeedsAngle = Utils.angleFromTranslation2d(currentSpeedsX, currentSpeedsY);
-
-        if(wantedSpeedsNorm == 0 && currentSpeedsNorm == 0) return Translation2d.kZero;
-
-        if(currentSpeedsNorm <0.1){
-            // LogManager.log("SMALL VEL");
-            double v = MathUtil.clamp(wantedSpeedsNorm, 0, currentSpeedsNorm + AccelConstants.MAX_DELTA_VELOCITY);
-            return new Translation2d(v, Rotation2d.fromRadians(wantedSpeedsAngle));
-        }
-
-        if(wantedSpeedsNorm == 0 && currentSpeedsNorm > 0.1) return new Translation2d(calculateLinearVelocity(wantedSpeedsNorm, currentSpeedsNorm), Rotation2d.fromRadians(lastAngle));
-        lastAngle = currentSpeedsAngle;
-        double angleDiff = MathUtil.angleModulus(wantedSpeedsAngle - currentSpeedsAngle);
-        double radius = currentSpeedsNorm / AccelConstants.MAX_OMEGA_VELOCITY;
-        // LogManager.log("RADIUS: " + radius);
-        if(Math.abs(angleDiff) < 0.6 || radius < AccelConstants.MAX_RADIUS){
-            
-            return new Translation2d(calculateLinearVelocity(wantedSpeedsNorm, currentSpeedsNorm), Rotation2d.fromRadians(wantedSpeedsAngle));
-        }
-
-        double velocity = Math.min(AccelConstants.MAX_VELOCITY_TO_IGNORE_RADIUS, Math.max(currentSpeedsNorm - (AccelConstants.MAX_DELTA_VELOCITY), AccelConstants.MIN_VELOCITY));
-    //    LogManager.log("NEW VELOCITY: " + velocity);
-        double radChange = Math.min(AccelConstants.MAX_OMEGA_VELOCITY, (velocity / AccelConstants.MAX_RADIUS) * CYCLE_DT);
-        return new Translation2d(velocity, Rotation2d.fromRadians((radChange * Math.signum(angleDiff)) + currentSpeedsAngle));
-        
-    }
 
     public void setSteerPositions(double[] positions) {
         for (int i = 0; i < positions.length; i++) {
@@ -375,52 +332,8 @@ public class Chassis extends SubsystemBase {
         }
     }
 
-    public void setVelocitiesRotateToAngleOld(ChassisSpeeds speeds, double angle) {
-        double angleError = angle - getGyroAngle().getRadians();
-        double angleErrorabs = Math.abs(angleError);
-        if (angleErrorabs > Math.toRadians(1.5)) {
-            speeds.omegaRadiansPerSecond = angleError * 1.5;
-        }
-
-        setVelocitiesWithAccel(speeds);
-    }
-
-    public void setVelocitiesRotateToTarget(ChassisSpeeds speeds, FieldTarget target) {
-        Translation2d robotToTarget = target.getReefPole().getTranslation().minus(getPose().getTranslation());
-        double angleError = robotToTarget.getAngle().minus(getGyroAngle()).getRadians();
-        double angleErrorabs = Math.abs(angleError);
-        if (angleErrorabs > Math.toRadians(1.5)) {
-            speeds.omegaRadiansPerSecond = angleError * 2;
-        }
-        setVelocities(speeds);
-    }
 
     PIDController drivePID = new PIDController(2, 0, 0);
-
-    public void goTo(Pose2d pose, double threshold, boolean stopWhenFinished) {
-
-        Translation2d diffVector = pose.getTranslation().minus(getPose().getTranslation());
-
-        double distance = diffVector.getNorm();
-        if (distance <= threshold) {
-            if (stopWhenFinished)
-                setVelocitiesRotateToAngleOld(new ChassisSpeeds(0, 0, 0), pose.getRotation().getRadians());
-            else
-                setVelocitiesRotateToAngleOld(
-                        new ChassisSpeeds(0.5 * diffVector.getAngle().getCos(), 0.5 * diffVector.getAngle().getSin(),
-                                0),
-                        pose.getRotation().getRadians());
-        }
-
-        else {
-            double vX = MathUtil.clamp(-drivePID.calculate(diffVector.getX(), 0), -3.2, 3.2);
-            double vY = MathUtil.clamp(-drivePID.calculate(diffVector.getY(), 0), -3.2, 3.2);
-
-
-            setVelocitiesRotateToAngleOld(new ChassisSpeeds(vX, vY, 0), pose.getRotation().getRadians());
-        }
-
-    }
 
     public void stop() {
         for (SwerveModule i : modules) {

@@ -28,9 +28,6 @@ public class Drive extends Command {
     }
     public static void setPrecisionMode(boolean precisionMode) {
         Drive.precisionMode = precisionMode;
-        if (!precisionMode) {
-            RobotContainer.robot1Strip.setNotPrecisionMode();
-        }
     }
     public static boolean getPrecisionMode() {
         return precisionMode;
@@ -59,6 +56,6 @@ public class Drive extends Command {
  
         if(precisionMode) chassis.setVelocities(speeds);
         else {
-            chassis.setVelocitiesWithAccel(speeds);}
+            chassis.setVelocities(speeds);}
     }
 }
