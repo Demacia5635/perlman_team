@@ -38,7 +38,6 @@ import frc.robot.RobotContainer;
 import static frc.robot.chassis.utils.ChassisConstants.*;
 
 import frc.robot.chassis.utils.SwerveKinematics;
-import frc.robot.utils.LogManager;
 import frc.robot.utils.Utils;
 import frc.robot.vision.Camera;
 import frc.robot.vision.Camera.CameraType;
@@ -122,10 +121,8 @@ public class Chassis extends SubsystemBase {
             public boolean isFinished() {return true;}
             public boolean runsWhenDisabled() {return true;};
         });
-        LogManager.addEntry("gyro", () -> getGyroAngle().getRadians());
         SmartDashboard.putData("field", field);
 
-        LogManager.addEntry("VELOCITY NORM: ", () -> Utils.hypot(getChassisSpeedsRobotRel().vxMetersPerSecond, getChassisSpeedsRobotRel().vyMetersPerSecond));
 
         SmartDashboard.putData("Chassis/set coast", new InstantCommand(() -> setNeutralMode(false)).ignoringDisable(true));
         SmartDashboard.putData("Chassis/set brake", new InstantCommand(() -> setNeutralMode(true)).ignoringDisable(true));

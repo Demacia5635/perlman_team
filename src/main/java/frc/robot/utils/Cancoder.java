@@ -29,7 +29,6 @@ public class Cancoder extends CANcoder {
 		configCancoder();
         setStatusSignals();
         addLog();
-		LogManager.log(name + " cancoder initialized");
     }
     
     private void configCancoder() {
@@ -51,13 +50,11 @@ public class Cancoder extends CANcoder {
 
     public void checkElectronics() {
         if (getFaultField().getValue() != 0) {
-            LogManager.log(name + " have a fault: " + getFaultField().getValue());
         }
     }
 
     private void addLog() {
         // LogManager.addEntry(name + "/Position", positionSignal, 2);
-        LogManager.addEntry(name + "/Absolute position", this::getCurrentAbsPosition, 2);
         // LogManager.addEntry(name + "/Velocity", velocitySignal, 2);
         // LogManager.addEntry(name + "/Acceleration", this::getCurrentAcceleration, 2);
     }

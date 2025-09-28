@@ -27,6 +27,9 @@ public class RobotContainer {
     driverController = new CommandController(OperatorConstants.DRIVER_CONTROLLER_PORT, ControllerType.kXbox);
     operatorController = new CommandController(OperatorConstants.OPERATOR_CONTROLLER_PORT, ControllerType.kXbox);
     controller = new CommandXboxController(0);
+    chassis = new Chassis();
+    Drive drive = new Drive(chassis, driverController);
+    chassis.setDefaultCommand(drive);
     //controller.a().onTrue(new MoveArm(null));
 
   }
