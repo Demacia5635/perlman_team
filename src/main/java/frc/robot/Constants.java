@@ -7,6 +7,7 @@ package frc.robot;
 import com.ctre.phoenix6.CANBus;
 
 import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
+import frc.robot.utils.TalonConfig;
 
 /**
  * The Constants class provides a convenient place for teams to hold robot-wide numerical or boolean
@@ -22,6 +23,10 @@ public final class Constants {
     public static final CANBus CHASSIS_CAN_BUS = new CANBus("canivore");
   }
 
+  public final class ClimbConstants{
+    public static final TalonConfig MOTOR_CONFIG = new TalonConfig(0, CANBuses.ARM_CAN_BUS, "climbMotor");
+    public static final int LIMIT_SWITCH_CHANNEL = 3;
+  }
   public static final class PowerDistributionConstants {
     public static final ModuleType MODULE_TYPE = ModuleType.kRev;
     public static final int POWER_DISTRIBUTION_ID = 16;

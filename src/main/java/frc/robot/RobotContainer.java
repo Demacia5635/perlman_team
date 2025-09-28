@@ -7,15 +7,17 @@ package frc.robot;
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.chassis.commands.Drive;
 import frc.robot.chassis.subsystems.Chassis;
+import frc.robot.subsystems.Climb;
 import frc.robot.utils.CommandController;
 import frc.robot.utils.CommandController.ControllerType;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 
 
 public class RobotContainer {
-
+  public static Climb climb;
   public static Chassis chassis; 
   public static boolean isRed;
   public static boolean isComp = DriverStation.isFMSAttached();
@@ -24,6 +26,7 @@ public class RobotContainer {
   public static CommandXboxController controller;
  
   public RobotContainer() {
+    climb = new Climb();
     driverController = new CommandController(OperatorConstants.DRIVER_CONTROLLER_PORT, ControllerType.kXbox);
     operatorController = new CommandController(OperatorConstants.OPERATOR_CONTROLLER_PORT, ControllerType.kXbox);
     controller = new CommandXboxController(0);
@@ -46,6 +49,7 @@ public class RobotContainer {
 
   public Command getAutonomousCommand() {
     chassis.setDefaultCommand(new Drive(chassis, driverController));
+
 
     return null;
   }
