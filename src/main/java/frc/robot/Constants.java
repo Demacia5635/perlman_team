@@ -36,5 +36,38 @@ public final class Constants {
     public static final int DRIVER_CONTROLLER_PORT = 0;
     public static final int OPERATOR_CONTROLLER_PORT = 1;
   }
+
+  public static final class GRIPER_CONSTANTS{
+    public static final int MOTOR_ID = 30;
+    public static final int DOWN_SENSOR_ID = 0;
+    public static final double CORAL_IN_DOWN_SENSOR = 4.2;
+
+  }
+
+  public static final class ARM_CONSTANTS{
+    public static final TalonConfig GRIPPER_CONFIG = new TalonConfig(21, CANBuses.ARM_CAN_BUS, "gruper joint")
+            .withBrake(true)
+            .withInvert(false)
+            .withMotionMagic(1.5, 3, 6)
+            .withPID(0, 0, 0, 0, 0, 0, 0)
+            .withRampTime(0.5)
+            .withMotorRatio(36.0 * (47.0 / 20.0)).withRadiansMotor(); 
+
+    public static final TalonConfig ARM_CONFIG = new TalonConfig(20, CANBuses.ARM_CAN_BUS, "arm joint")
+            .withBrake(true)
+            .withInvert(false)
+            .withMotionMagic(1.5, 3, 6)
+            .withPID(0, 0, 0, 0, 0, 0, 0)
+            .withRampTime(0.5)
+            .withMotorRatio(36.0 * (105.0 / 16.0)).withRadiansMotor(); 
+    
+    public static final int MAGNET_CHANEL = 0;
+    public static final int ABS_CANCODER = 1;
+    public static final double ENCODER_BASE_ANGLE = 3.1763315220836814 - 1.5*Math.PI;
+
+
+  }
+
+    
 }
 
